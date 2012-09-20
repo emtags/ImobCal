@@ -1,0 +1,70 @@
+﻿<html>
+	<head>
+		<title>ImobCal - Exemplo</title>
+		<!-- Scripts -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
+		<script>
+			$(function() {
+				var valorImovel = $( "#valorImovel" ),
+				valorEntrada = $( "#valorEntrada" ),
+				allFields = $( [] ).add( valorImovel ).add( valorEntrada ),
+				tips = $( ".validateTips" );
+			
+				function updateTips( t ) {
+					tips.text( t ).addClass( "ui-state-highlight" );
+					setTimeout(function() {
+						tips.removeClass( "ui-state-highlight", 1500 );
+					}, 500 );
+				}
+				
+				function checkLength( o, n, min, max ) {
+					if ( o.val().length > max || o.val().length < min ) {
+						o.addClass( "ui-state-error" );
+						updateTips( "Length of " + n + " must be between " +
+							min + " and " + max + "." );
+						return false;
+					} else {
+						return true;
+					}
+				}
+			
+				$( "#dialog:ui-dialog" ).dialog( "destroy" );
+				$( "#dialog-form" ).dialog({
+					/* autoOpen: false, */
+					height: 300,
+					width: 600,
+					modal: true,
+					buttons: {
+						"Simular": function() {
+							var bValid = true;
+							allFields.removeClass( "ui-state-error" );
+							bValid = bValid && checkLength( valorImovel, "valorImovel", 3, 16 );
+						},
+						"Cancelar": function() {
+							$( this ).dialog( "close" );
+						}
+					},
+					close: function() {
+						allFields.val( "" ).removeClass( "ui-state-error" );
+					}
+				});
+			});
+		</script>
+		<!-- Themes -->
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/humanity/jquery-ui.css" type="text/css" media="all" />
+	</head>
+	<body>
+		<div id="dialog-form" title="Simulação de financiamento de Imóvel">
+			<p class="validateTips">Todos os campos são obrigatórios.</p>
+			<form>
+				<fieldset>
+					<label for="valorImovel">Valor do Imóvel</label>
+					<input type="text" name="valorImovel" id="valorImovel" class="text ui-widget-content ui-corner-all" />
+					<label for="valorEntrada">Valor da Entrada</label>
+					<input type="text" name="valorEntrada" id="valorEntrada" value="" class="text ui-widget-content ui-corner-all" />
+				</fieldset>
+			</form>
+		</div>
+	</body>
+</html>
