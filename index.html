@@ -8,8 +8,17 @@
 			$(function() {
 				var valorImovel = $( "#valorImovel" ),
 				valorEntrada = $( "#valorEntrada" ),
-				allFields = $( [] ).add( valorImovel ).add( valorEntrada ),
-				tips = $( ".validateTips" );
+				Prazo = $( "#Prazo" ),
+				taxaDeJuros = $( "#taxaDeJuros" ),
+				correcaoMonetaria = $( "#correcaoMonetaria" ),
+				allFields = $( [] )
+					.add( valorImovel )
+					.add( valorEntrada )
+					.add( Prazo )
+					.add( taxaDeJuros )
+					.add( correcaoMonetaria ),
+				tips = $( ".validateTips" ),
+				result = $( ".Result" );
 			
 				function updateTips( t ) {
 					tips.text( t ).addClass( "ui-state-highlight" );
@@ -28,17 +37,43 @@
 						return true;
 					}
 				}
+				
+				function calcle() {
+					/* CALCULA SACRE */
+					valorTotal = valorImovel.val() - valorEntrada.val();
+					jurosMensal = (taxaDeJuros.val()/12)/100;
+					parcelasTotal = (Prazo.val() * 12);
+					tr = correcaoMonetaria.val();
+					
+					result.append("Valor Financiado: " + valorTotal.toFixed(2) + "<br />");
+					result.append("Juros Mensal: " + (jurosMensal*100).toFixed(2) + "% <br />");
+					result.append("Primeira parcela: " + (valorTotal * (jurosMensal + 1/parcelasTotal)).toFixed(2) + "<br />");
+					teste = valorTotal;
+					for (i = parcelasTotal; i>1; i -- ) {
+						parcela = (teste * (jurosMensal + 1/i));
+						parcela = Math.round (parcela*100) / 100;
+						// Juros Aparentes ja
+						ja = jurosMensal * ( 1 + tr ) * teste;
+						// Amortização Aparente aa
+						aa = parcela - ja;
+						teste = ( 1 + tr ) * teste - aa;
+						//result.append(i + " " + parcela + " " + "<br />");
+					}
+					teste = Math.round (teste*100) / 100;
+					result.append("Última parcela: " + teste.toFixed(2));
+				}
 			
 				$( "#dialog:ui-dialog" ).dialog( "destroy" );
 				$( "#dialog-form" ).dialog({
 					/* autoOpen: false, */
-					height: 300,
-					width: 600,
+					height: 500,
+					width: 280,
 					modal: true,
 					buttons: {
 						"Simular": function() {
 							var bValid = true;
 							allFields.removeClass( "ui-state-error" );
+							calcle();
 							bValid = bValid && checkLength( valorImovel, "valorImovel", 3, 16 );
 						},
 						"Cancelar": function() {
@@ -57,12 +92,19 @@
 	<body>
 		<div id="dialog-form" title="Simulação de financiamento de Imóvel">
 			<p class="validateTips">Todos os campos são obrigatórios.</p>
+			<p class="Result"></p>
 			<form>
 				<fieldset>
 					<label for="valorImovel">Valor do Imóvel</label>
 					<input type="text" name="valorImovel" id="valorImovel" class="text ui-widget-content ui-corner-all" />
-					<label for="valorEntrada">Valor da Entrada</label>
+					<label for="valorEntrada">Valor de Entrada</label>
 					<input type="text" name="valorEntrada" id="valorEntrada" value="" class="text ui-widget-content ui-corner-all" />
+					<label for="Prazo">Prazo</label>
+					<input type="text" name="Prazo" id="Prazo" value="" class="text ui-widget-content ui-corner-all" />
+					<label for="taxaDeJuros">Taxa de Juros</label>
+					<input type="text" name="taxaDeJuros" id="taxaDeJuros" value="" class="text ui-widget-content ui-corner-all" />
+					<label for="correcaoMonetaria">Correção Monetária</label>
+					<input type="text" name="correcaoMonetaria" id="correcaoMonetaria" value="" class="text ui-widget-content ui-corner-all" />
 				</fieldset>
 			</form>
 		</div>
