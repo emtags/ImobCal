@@ -38,13 +38,23 @@
 					}
 				}
 				
+				function checkEntrada( o, n, min, value ) {
+					if ( (o.val()/value.val())*100 < min ) {
+						o.addClass( "ui-state-error" );
+						updateTips( "Valor da Entrada não pode ser menor que 20% do valor do imóvel." );
+						return false;
+					} else {
+						return true;
+					}
+				}
+				
 				function calcle() {
 					/* CALCULA SACRE */
 					valorTotal = valorImovel.val() - valorEntrada.val();
 					jurosMensal = (taxaDeJuros.val()/12)/100;
 					parcelasTotal = (Prazo.val() * 12);
 					tr = correcaoMonetaria.val();
-					
+					result.empty();
 					result.append("Valor Financiado: " + valorTotal.toFixed(2) + "<br />");
 					result.append("Juros Mensal: " + (jurosMensal*100).toFixed(2) + "% <br />");
 					result.append("Primeira parcela: " + (valorTotal * (jurosMensal + 1/parcelasTotal)).toFixed(2) + "<br />");
@@ -75,6 +85,7 @@
 							allFields.removeClass( "ui-state-error" );
 							calcle();
 							bValid = bValid && checkLength( valorImovel, "valorImovel", 3, 16 );
+							bValid = bValid && checkEntrada( valorEntrada, "valorImovel", 20, valorImovel );
 						},
 						"Cancelar": function() {
 							$( this ).dialog( "close" );
